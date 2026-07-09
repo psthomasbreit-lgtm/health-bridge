@@ -62,11 +62,15 @@ class MainActivity : ComponentActivity() {
         HealthPermission.getReadPermission(FloorsClimbedRecord::class),
     )
 
+    private var pendingServerUrl: String = ""
+
     private val requestPermissions = registerForActivityResult(
         PermissionController.createRequestPermissionResultContract()
     ) { granted ->
         if (granted.containsAll(PERMISSIONS)) {
-            triggerSync()
+            triggerSync(pendingServerUrl)
+        } else {
+            statusText.value = "⚠️ Permisos denegados en Health Connect. Ábrelo y concede los permisos a HealthBridge."
         }
     }
 
@@ -113,14 +117,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun checkPermissionsAndSync(serverUrl: String) {
-        lifecycleScope.launch {
-            val granted = healthConnectClient.permissionController.getGrantedPermissions()
-            if (granted.containsAll(PERMISSIONS)) {
-                triggerSync(serverUrl)
-            } else {
-                requestPermissions.launch(PERMISSIONS)
-            }
-        }
+        pendingServerUrl = serverUrl
+        statusText.value = "Solicitando permisos de Health Connect…"
+        requestPermissions.launch(PERMISSIONS)
     }
 
     private fun triggerSync(serverUrl: String? = null) {

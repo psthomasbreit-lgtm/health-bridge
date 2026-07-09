@@ -1,6 +1,8 @@
 package com.healthbridge
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -118,8 +120,32 @@ class MainActivity : ComponentActivity() {
 
     private fun checkPermissionsAndSync(serverUrl: String) {
         pendingServerUrl = serverUrl
-        statusText.value = "Solicitando permisos de Health Connect…"
-        requestPermissions.launch(PERMISSIONS)
+        statusText.value = "Abriendo permisos de Health Connect…"
+        // Try to open Health Connect permissions page for this app directly
+        val opened = tryOpenHealthConnectPermissions()
+        if (!opened) {
+            requestPermissions.launch(PERMISSIONS)
+        }
+    }
+
+    private fun tryOpenHealthConnectPermissions(): Boolean {
+        val intents = listOf(
+            Intent("android.health.connect.action.MANAGE_HEALTH_PERMISSIONS")
+                .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName),
+            Intent("androidx.health.ACTION_MANAGE_HEALTH_PERMISSIONS")
+                .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName),
+            Intent(Intent.ACTION_VIEW, Uri.parse("package:$packageName")).apply {
+                setPackage("com.google.android.apps.healthdata")
+            }
+        )
+        for (intent in intents) {
+            try {
+                startActivity(intent)
+                statusText.value = "Busca 'HealthBridge' en Health Connect y activa TODOS los permisos. Luego vuelve aquí y presiona Sincronizar."
+                return true
+            } catch (_: Exception) {}
+        }
+        return false
     }
 
     private fun triggerSync(serverUrl: String? = null) {

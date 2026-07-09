@@ -263,7 +263,7 @@ class MainActivity : ComponentActivity() {
     private fun exerciseTypeName(type: Int): String = when (type) {
         ExerciseSessionRecord.EXERCISE_TYPE_RUNNING         -> "running"
         ExerciseSessionRecord.EXERCISE_TYPE_WALKING         -> "walking"
-        ExerciseSessionRecord.EXERCISE_TYPE_CYCLING         -> "cycling"
+        ExerciseSessionRecord.EXERCISE_TYPE_BIKING          -> "cycling"
         ExerciseSessionRecord.EXERCISE_TYPE_SWIMMING_OPEN_WATER,
         ExerciseSessionRecord.EXERCISE_TYPE_SWIMMING_POOL   -> "swimming"
         ExerciseSessionRecord.EXERCISE_TYPE_STRENGTH_TRAINING -> "strength_training"
